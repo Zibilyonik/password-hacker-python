@@ -6,7 +6,7 @@ import socket
 #this function receives the parameters from the command line
 def get_parameters():
     ip_address = sys.argv[1]
-    port = sys.argv[2]
+    port = int(sys.argv[2])
     message = sys.argv[3]
     combined = (ip_address, port)
     return combined, message
