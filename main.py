@@ -2,27 +2,36 @@
 
 import sys
 import socket
+import itertools
+import string
 
 #this function receives the parameters from the command line
 def get_parameters():
     ip_address = sys.argv[1]
     port = int(sys.argv[2])
-    message = sys.argv[3]
     combined = (ip_address, port)
-    return combined, message
+    return combined
 
-def socket_connection(url, message):
-    with socket.socket() as client_socket:
-        client_socket.connect(url)
-        message = message.encode()
-        client_socket.send(message)
-        response = client_socket.recv(1024)
-        response = response.decode()
-        return response
+def brute_force():
+    possible_chars = string.ascii_lowercase + string.digits
+    for i in range(1, 5):
+        for s in itertools.product(possible_chars, repeat=i):
+            yield "".join(s)
+
+
+def socket_connection(url):
+    with socket.socket() as client:
+        client.connect(url)
+        for message in brute_force():
+            client.send(message.encode())
+            response = client.recv(1024).decode()
+            if "Connection success!" in response:
+                return message
 
 def main():
-    response = socket_connection(get_parameters()[0], get_parameters()[1])
-    print(response)
+    url = get_parameters()
+    password = socket_connection(url)
+    print(password)
     
 
 
