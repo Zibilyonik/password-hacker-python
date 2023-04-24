@@ -3,7 +3,6 @@
 import sys
 import socket
 import itertools
-import string
 
 #this function receives the parameters from the command line
 def get_parameters():
@@ -12,11 +11,17 @@ def get_parameters():
     combined = (ip_address, port)
     return combined
 
+def get_passwords():
+    passwords = []
+    with open("/passwords.txt", "r") as file:
+        for line in file:
+            yield line.strip()
+            passwords.append(line.strip())
+    return passwords
+
 def brute_force():
-    possible_chars = string.ascii_lowercase + string.digits
-    for i in range(1, 5):
-        for s in itertools.product(possible_chars, repeat=i):
-            yield "".join(s)
+    passwords = get_passwords()
+    yield map(lambda x: ''.join(x), itertools.product(*([letter.lower(), letter.upper()] for letter in passwords)))
 
 
 def socket_connection(url):
