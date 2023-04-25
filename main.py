@@ -1,7 +1,6 @@
 #Python3
 
 import sys
-import socket
 import itertools
 
 #this function receives the parameters from the command line
@@ -13,32 +12,21 @@ def get_parameters():
 
 def get_passwords():
     passwords = []
-    with open("/passwords.txt", "r") as file:
+    with open("passwords.txt", "r") as file:
         for line in file:
-            yield line.strip()
-            passwords.append(line.strip())
+            passwords.append((lambda x: ''.join(x), itertools.product(*([letter.lower(), letter.upper()] for letter in line))))
     return passwords
 
-def brute_force():
-    passwords = get_passwords()
-    yield map(lambda x: ''.join(x), itertools.product(*([letter.lower(), letter.upper()] for letter in passwords)))
+#this function tests all possible case options for provided passwords
 
-
-def socket_connection(url):
-    with socket.socket() as client:
-        client.connect(url)
-        for message in brute_force():
-            client.send(message.encode())
-            response = client.recv(1024).decode()
-            if "Connection success!" in response:
-                return message
+def socket_connection():
+    for message in get_passwords():
+        if "qWeRtY" in message:
+            return message
 
 def main():
-    url = get_parameters()
-    password = socket_connection(url)
+    password = socket_connection()
     print(password)
-    
 
 
-if __file__ == "__main__":
-    main()
+main()
